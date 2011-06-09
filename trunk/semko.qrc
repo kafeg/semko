@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/block_wall.png</file>
+        <file>img/semko_normal.png</file>
+        <file>img/semko_pressed.png</file>
+        <file>tr/semko_ru.qm</file>
+    </qresource>
+</RCC>
