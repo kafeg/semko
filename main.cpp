@@ -1,4 +1,4 @@
-#include <QtGui/QApplication>
+#include <QApplication>
 #include "mainwgt.h"
 #include <QTime>
 #include <QTranslator>
@@ -10,9 +10,9 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
 
   QTextCodec* codec = QTextCodec::codecForName("UTF-8");
-  QTextCodec::setCodecForCStrings(codec);
+  //QTextCodec::setCodecForCStrings(codec);
   QTextCodec::setCodecForLocale(codec);
-  QTextCodec::setCodecForTr(codec);
+  //QTextCodec::setCodecForTr(codec);
 
   QTranslator qtTranslator;
   qtTranslator.load("qt_" + QLocale::system().name(),

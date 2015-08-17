@@ -3,7 +3,9 @@
 # -------------------------------------------------
 QT += core \
     gui \
-    phonon
+    multimedia \
+    widgets #\
+    #phonon
 TARGET = semko
 TEMPLATE = app
 SOURCES += main.cpp \

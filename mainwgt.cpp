@@ -8,6 +8,8 @@
 #include <QFile>
 #include "SlidingStackedWidget.h"
 #include <QDir>
+#include <QStandardPaths>
+#include <QAudioOutput>
 
 static int nextLevelCount, placeTimerInterval, semkoInterval = 30;
 static const int lives = 10, placeTimerIntervalDecrement = 50,placeTimerIntervalMin = 200,
@@ -48,19 +50,34 @@ MainWgt::MainWgt(QWidget *parent) :
 
   loadResults();
 
-  musicOutput = new Phonon::AudioOutput(Phonon::MusicCategory, this);
+  QAudioFormat format;
+  // Set up the format, eg.
+  format.setSampleRate(8000);
+  format.setChannelCount(1);
+  format.setSampleSize(8);
+  format.setCodec("audio/pcm");
+  format.setByteOrder(QAudioFormat::LittleEndian);
+  format.setSampleType(QAudioFormat::UnSignedInt);
+
+  QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+  if (!info.isFormatSupported(format)) {
+      qWarning() << "Raw audio format not supported by backend, cannot play audio.";
+      return;
+  }
+
+  musicOutput = new QAudioOutput(format, this);
   musicOutput->setVolume(0.5);
-  notifyOutput = new Phonon::AudioOutput(Phonon::NotificationCategory, this);
+  notifyOutput = new QAudioOutput(format, this);
   notifyOutput->setVolume(0.7);
 
-  moMainTheme = new Phonon::MediaObject(this);
+  moMainTheme = new QMediaObject(this);
   connect(moMainTheme,SIGNAL(finished()),moMainTheme,SLOT(play()));
-  moMainTheme->setCurrentSource(Phonon::MediaSource(QApplication::applicationDirPath() + "/sounds/mainTheme.mp3"));
+  moMainTheme->setCurrentSource(QMediaSource(QApplication::applicationDirPath() + "/sounds/mainTheme.mp3"));
   Phonon::createPath(moMainTheme, musicOutput);
 
-  moGameOver  = new Phonon::MediaObject(this);
-  moGameOver->setCurrentSource(Phonon::MediaSource(QApplication::applicationDirPath() + "/sounds/gameOver.mp3"));
-  Phonon::createPath(moGameOver, notifyOutput);
+  //moGameOver  = new Phonon::MediaObject(this);
+  //moGameOver->setCurrentSource(Phonon::MediaSource(QApplication::applicationDirPath() + "/sounds/gameOver.mp3"));
+  //Phonon::createPath(moGameOver, notifyOutput);
 }
 
 bool MainWgt::isSound()
@@ -75,7 +92,7 @@ MainWgt::~MainWgt()
 
 void MainWgt::loadResults()
 {
-  QFile resultsFile(QDesktopServices::storageLocation(QDesktopServices::DataLocation)+"/semko.txt");
+  QFile resultsFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/semko.txt");
   if (!resultsFile.open(QIODevice::ReadOnly | QIODevice::Text)){
     return;
   }
@@ -92,11 +109,11 @@ void MainWgt::loadResults()
 
 void MainWgt::saveResults()
 {
-  QDir dataDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
+  QDir dataDir(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
   if (!dataDir.exists()){
-    dataDir.mkpath(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
+    dataDir.mkpath(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
   }
-  QFile resultsFile(QDesktopServices::storageLocation(QDesktopServices::DataLocation)+"/semko.txt");
+  QFile resultsFile(QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/semko.txt");
   if (!resultsFile.open(QIODevice::WriteOnly | QIODevice::Text)){
     return;
   }
@@ -127,9 +144,9 @@ void MainWgt::updateResultsList()
 
 void MainWgt::startGame()
 {
-  if (isSound()){
-    moMainTheme->play();
-  }
+  //if (isSound()){
+  //  moMainTheme->play();
+  //}
   placeSemkoTimer->stop();
   placeTimerInterval = 1000;
   placeSemkoTimer->setInterval(placeTimerInterval);
@@ -194,10 +211,10 @@ void MainWgt::slotGameOver(bool isWinner)
   placeSemkoTimer->stop();
   QApplication::processEvents();
 
-  if (isSound()){
-    moMainTheme->stop();
-    moGameOver->play();
-  }
+  //if (isSound()){
+  //  moMainTheme->stop();
+  //  moGameOver->play();
+  //}
 
   QString name = QInputDialog::getText(this,tr("Game over!"), tr("Enter your name"));
   if (name.isEmpty()){
@@ -230,9 +247,9 @@ void MainWgt::on_pbStartGame_clicked()
 
 void MainWgt::on_pbBackFromGame_clicked()
 {
-  if (isSound()){
-    moMainTheme->stop();
-  }
+  //if (isSound()){
+  //  moMainTheme->stop();
+  //}
   emit gameOver(false);
   placeSemkoTimer->stop();
   stacked->slideInIdx(stacked->indexOf(pMenu));
