@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.4.2, 2015-09-03T20:53:17. -->
+<!-- Written by QtCreator 3.4.2, 2015-09-03T21:14:05. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -177,7 +177,7 @@
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.AndroidPackageInstallationStep</value>
      </valuemap>
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.3">
-      <value type="QString" key="BuildTargetSdk">android-16</value>
+      <value type="QString" key="BuildTargetSdk">android-21</value>
       <value type="QString" key="KeystoreLocation">D:/Dropbox/work/other/android_release_normal.keystore</value>
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Сборка Android APK</value>
