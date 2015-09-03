@@ -5,11 +5,11 @@
 #include <QDesktopServices>
 #include <QDebug>
 #include <QInputDialog>
-#include <QFile>
 #include "SlidingStackedWidget.h"
 #include <QDir>
 #include <QStandardPaths>
-#include <QAudioOutput>
+//#include <QAudioOutput>
+#include <QMediaPlayer>
 
 static int nextLevelCount, placeTimerInterval, semkoInterval = 30;
 static const int lives = 10, placeTimerIntervalDecrement = 50,placeTimerIntervalMin = 200,
@@ -50,30 +50,37 @@ MainWgt::MainWgt(QWidget *parent) :
 
   loadResults();
 
-  QAudioFormat format;
-  // Set up the format, eg.
-  format.setSampleRate(8000);
-  format.setChannelCount(1);
-  format.setSampleSize(8);
-  format.setCodec("audio/pcm");
-  format.setByteOrder(QAudioFormat::LittleEndian);
-  format.setSampleType(QAudioFormat::UnSignedInt);
+  //sourceMusicFile.setFileName(":/sounds/mainTheme.mp3");
+  //sourceMusicFile.open(QIODevice::ReadOnly);
 
-  QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-  if (!info.isFormatSupported(format)) {
-      qWarning() << "Raw audio format not supported by backend, cannot play audio.";
-      return;
-  }
+  //sourceNotifyFile.setFileName(":/sounds/gameOver.mp3");
+  //sourceNotifyFile.open(QIODevice::ReadOnly);
 
-  musicOutput = new QAudioOutput(format, this);
-  musicOutput->setVolume(0.5);
-  notifyOutput = new QAudioOutput(format, this);
-  notifyOutput->setVolume(0.7);
+  mainThemePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/mainTheme.mp3";
+  gameOverPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation)+"/gameOver.mp3";
 
-  moMainTheme = new QMediaObject(this);
-  connect(moMainTheme,SIGNAL(finished()),moMainTheme,SLOT(play()));
-  moMainTheme->setCurrentSource(QMediaSource(QApplication::applicationDirPath() + "/sounds/mainTheme.mp3"));
-  Phonon::createPath(moMainTheme, musicOutput);
+  QFile::copy(":/sounds/mainTheme.mp3" , mainThemePath);
+  QFile::copy(":/sounds/gameOver.mp3" , gameOverPath);
+
+  //mainThemePath = "C:/Android/sample.ogg";
+  qDebug() << mainThemePath;
+
+  mediaPlayer = new QMediaPlayer(this);
+  //connect(player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+  mediaPlayer->setMedia(QUrl::fromLocalFile(mainThemePath));
+  mediaPlayer->setVolume(50);
+
+  //musicOutput = new QAudioOutput(format, this);
+  //musicOutput->setVolume(0.5);
+  //connect(musicOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(handleStateChanged(QAudio::State)));
+
+  //notifyOutput = new QAudioOutput(format, this);
+  //notifyOutput->setVolume(0.7);
+
+  //moMainTheme = new QMediaObject();
+  //connect(moMainTheme,SIGNAL(finished()),moMainTheme,SLOT(play()));
+  //moMainTheme->setCurrentSource(QMediaSource(QApplication::applicationDirPath() + "/sounds/mainTheme.mp3"));
+  //Phonon::createPath(moMainTheme, musicOutput);
 
   //moGameOver  = new Phonon::MediaObject(this);
   //moGameOver->setCurrentSource(Phonon::MediaSource(QApplication::applicationDirPath() + "/sounds/gameOver.mp3"));
@@ -144,9 +151,11 @@ void MainWgt::updateResultsList()
 
 void MainWgt::startGame()
 {
-  //if (isSound()){
+  if (isSound()){
   //  moMainTheme->play();
-  //}
+    mediaPlayer->setMedia(QUrl::fromLocalFile(mainThemePath));
+    mediaPlayer->play();
+  }
   placeSemkoTimer->stop();
   placeTimerInterval = 1000;
   placeSemkoTimer->setInterval(placeTimerInterval);
@@ -211,10 +220,15 @@ void MainWgt::slotGameOver(bool isWinner)
   placeSemkoTimer->stop();
   QApplication::processEvents();
 
-  //if (isSound()){
+  if (isSound()){
   //  moMainTheme->stop();
+    //musicOutput->stop();
+    //notifyOutput->start(&sourceNotifyFile);
+    mediaPlayer->stop();
+    mediaPlayer->setMedia(QUrl::fromLocalFile(gameOverPath));
+    mediaPlayer->play();
   //  moGameOver->play();
-  //}
+  }
 
   QString name = QInputDialog::getText(this,tr("Game over!"), tr("Enter your name"));
   if (name.isEmpty()){
@@ -247,9 +261,11 @@ void MainWgt::on_pbStartGame_clicked()
 
 void MainWgt::on_pbBackFromGame_clicked()
 {
-  //if (isSound()){
+  if (isSound()){
   //  moMainTheme->stop();
-  //}
+    mediaPlayer->stop();
+    //musicOutput->stop();
+  }
   emit gameOver(false);
   placeSemkoTimer->stop();
   stacked->slideInIdx(stacked->indexOf(pMenu));

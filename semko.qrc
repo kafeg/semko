@@ -4,5 +4,7 @@
         <file>img/semko_normal.png</file>
         <file>img/semko_pressed.png</file>
         <file>tr/semko_ru.qm</file>
+        <file>sounds/gameOver.mp3</file>
+        <file>sounds/mainTheme.mp3</file>
     </qresource>
 </RCC>

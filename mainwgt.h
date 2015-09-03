@@ -6,11 +6,11 @@
 #include <QTimer>
 #include <QMap>
 #include <QListWidget>
+#include <QFile>
 //#include <Phonon/MediaObject>
 //#include <Phonon/AudioOutput>
 //#include <Phonon/MediaSource>
-class QAudioOutput;
-class QMediaObject;
+class QMediaPlayer;
 
 namespace Ui {
   class MainWgt;
@@ -42,8 +42,9 @@ private:
   QListWidget *resultsList;
 
   bool isSound();
-   QMediaObject *moMainTheme, *moGameOver;
-   QAudioOutput *musicOutput, *notifyOutput;
+  QString mainThemePath, gameOverPath;
+  //QFile sourceMusicFile, sourceNotifyFile;   // class member.
+  QMediaPlayer *mediaPlayer;
 
 private slots:
   void placeSemko();
